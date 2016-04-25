@@ -58,7 +58,7 @@ class mines(gtk.Window):
 	#初始化雷索引
 	def createMinesIndex(self):
 		self.minesIndex=[]
-		minesSum=10
+		minesSum=9
 		while len(self.minesIndex)<minesSum:
 			mine= random.randint(0,8*8-1)
 			if mine not in self.minesIndex:
@@ -74,7 +74,7 @@ class mines(gtk.Window):
 			mButton=Mine()
 			self.minesList.append(mButton)
 			self.table.attach(mButton,i%row,i%row+1,i/column,i/column+1)
-			mButton.connect('clicked',self.clicked)
+			mButton.connect('clicked',self.clicked,i)
 			mButton.num=self.getInitNum(i)
 		
 
@@ -85,11 +85,29 @@ class mines(gtk.Window):
 		self.add(self.table)
 		self.show_all()
 		self.connect('destroy',gtk.main_quit)
+		self.hasCheckList=[]
 		# self.minesList[0].image.set_from_file('6.gif')
 
 	#使用深度优先搜索数字为0的并显示出来
-	def clicked(self,widget):
-		pass
+	def clicked(self,widget,i,row=8,column=8):
+		print str(widget.num)+" *** "+str(i)
+
+		if(widget.num !=0 and widget.num !=-1):
+			widget.click(widget)
+
+		if(widget.num==0):
+			if i not in self.hasCheckList:
+				self.hasCheckList.append(i)
+			print self.hasCheckList
+			widget.click(widget)
+			if(i>=8 and self.minesList[i-8].num!=-1 and i-8 not in self.hasCheckList):
+				self.clicked(self.minesList[i-8],i-8)
+			if(i>=1 and self.minesList[i-1].num!=-1 and i-1 not in self.hasCheckList):
+				self.clicked(self.minesList[i-1],i-1)
+			if(i+1<=row*column-1 and self.minesList[i+1].num!=-1 and i+1 not in self.hasCheckList):
+				self.clicked(self.minesList[i+1],i+1)
+			if(i+8<=row*column-1 and self.minesList[i+8].num!=-1 and i+8 not in self.hasCheckList):
+				self.clicked(self.minesList[i+8],i+8)
 
 m=mines()
 gtk.main()
